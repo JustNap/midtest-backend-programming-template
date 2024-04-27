@@ -1,25 +1,53 @@
 const usersRepository = require('./users-repository');
 const { hashPassword, passwordMatched } = require('../../../utils/password');
+const { func } = require('joi');
 
 /**
  * Get list of users
  * @returns {Array}
  */
-async function getUsers() {
-  const users = await usersRepository.getUsers();
 
-  const results = [];
-  for (let i = 0; i < users.length; i += 1) {
-    const user = users[i];
-    results.push({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    });
+async function getUsers(page_number, page_size, search, sort){
+  const skip = (page_number - 1) * page_size;
+
+  let filtrate = {};
+
+  if(search){
+    filtrate = {eamil: {$regex: search, $option: 'i'}};
   }
 
-  return results;
+  let sorting = {};
+
+  if(sort){
+    const [field, order] = sort.split(':');
+    if (order === 'desc'){
+      sorting[field] = -1;
+    } else{
+      sorting[field] = 1;
+    }
+  }
+
+  const users = await usersRepository.userPaginate(filtrate, sorting, skip, page_size);
+  const sum = await usersRepository.calculateUser(filtrate);
+
+  return {results: users, total: sum};
 }
+
+// async function getUsers() {
+//   const users = await usersRepository.getUsers();
+
+//   const results = [];
+//   for (let i = 0; i < users.length; i += 1) {
+//     const user = users[i];
+//     results.push({
+//       id: user.id,
+//       name: user.name,
+//       email: user.email,
+//     });
+//   }
+
+//   return results;
+// }
 
 /**
  * Get user detail

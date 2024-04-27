@@ -1,3 +1,4 @@
+const { func } = require('joi');
 const { User } = require('../../../models');
 
 /**
@@ -8,6 +9,13 @@ async function getUsers() {
   return User.find({});
 }
 
+async function userPaginate(filtrate, sorting, skip, limit){
+  return User.find(filtrate).sort(sorting).skip(skip).limit(limit);
+}
+
+async function calculateUser(filtrate){
+  return User.countDocuments(filtrate);
+}
 /**
  * Get user detail
  * @param {string} id - User ID
@@ -84,6 +92,8 @@ async function changePassword(id, password) {
 module.exports = {
   getUsers,
   getUser,
+  userPaginate,
+  calculateUser,
   createUser,
   updateUser,
   deleteUser,
