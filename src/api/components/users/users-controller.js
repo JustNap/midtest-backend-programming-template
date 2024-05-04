@@ -12,7 +12,7 @@ async function getUsers(request, response, next) {
   try {
 
     const page_number = parseInt(request.query.page_number) || 1;
-    const page_size = parseInt(request.query.page_size) || 10;
+    const page_size = parseInt(request.query.page_size) || 5;
     const sort = request.query.sort || '';
     const search = request.query.search || '';
 
