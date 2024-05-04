@@ -23,7 +23,7 @@ async function getUsers(request, response, next) {
       Page_Size: page_size,
       Count: users.total,
       Total_Page: Math.ceil(users.total / page_size),
-      Has_Previous_page: page_number > 1,
+      Has_Previous_Page: page_number > 1,
       Has_Next_Page: page_number < Math.ceil(users.total / page_size),
       Data: users.results.map(user => ({
         id: user._id,
@@ -34,7 +34,7 @@ async function getUsers(request, response, next) {
     };
 
 
-    return response.status(200).json(users);
+    return response.status(200).json(data);
   } catch (error) {
     return next(error);
   }

@@ -13,7 +13,7 @@ async function getUsers(page_number, page_size, search, sort){
   let filtrate = {};
 
   if(search){
-    filtrate = {eamil: {$regex: search, $option: 'i'}};
+    filtrate = {email: {$regex: search, $options: 'i'}};
   }
 
   let sorting = {};
