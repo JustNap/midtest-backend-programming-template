@@ -97,12 +97,14 @@ async function changePassword(id, password) {
 
 // untuk setoran dana
 async function Deposit(id, amount){
+  // untuk menambahkan amount ke balance
   return User.updateOne({_id: id}, {$inc: {balance: amount}});
 }
 
 // untuk penarikan dana
 async function Withdraw(id, amount){
   return User.updateOne(
+    // akan di lakukan pengecekan saldo yang ada, sebelum di lakukan penarikan, setelah melakukan penarikan amount akan berkurang dari balance
     {_id: id, balance: {$gte: amount}}, 
     {$inc: {balance: -amount}});
 }
@@ -111,11 +113,13 @@ async function Withdraw(id, amount){
 async function Histori(id){
   const user = await User.findById(id);
 
+  // untuk mengembalikan nilai array untuk menampung sebuah transaksi
   return user.transactions || [];
 }
 
 // di akan ditampikan lewat function ini
 async function Statement(id, transaction){
+  // menggunakan metode operator push untuk menambahkan transaksi kedalam array
   return User.updateOne({_id: id}, {$push: {transactions: transaction}});
 }
 
