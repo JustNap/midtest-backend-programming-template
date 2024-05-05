@@ -95,19 +95,30 @@ async function changePassword(id, password) {
 
 // digital banking
 
+// untuk setoran dana
 async function Deposit(id, amount){
   return User.updateOne({_id: id}, {$inc: {balance: amount}});
 }
 
+// untuk penarikan dana
 async function Withdraw(id, amount){
   return User.updateOne(
     {_id: id, balance: {$gte: amount}}, 
     {$inc: {balance: -amount}});
 }
 
+// chack mutasi yang sudah dilakukan akan di simpan by id
+async function Histori(id){
+  const user = await User.findById(id);
+
+  return user.transactions || [];
+}
+
+// di akan ditampikan lewat function ini
 async function Statement(id, transaction){
   return User.updateOne({_id: id}, {$push: {transactions: transaction}});
 }
+
 
 module.exports = {
   getUsers,
@@ -122,4 +133,5 @@ module.exports = {
   Deposit,
   Withdraw,
   Statement,
+  Histori,
 };

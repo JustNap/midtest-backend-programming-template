@@ -7,17 +7,21 @@ const { func } = require('joi');
  * @returns {Array}
  */
 
+// untuk membuat pagination
 async function getUsers(page_number, page_size, search, sort){
+  // untuk membuat banyak data perhalaman
   const skip = (page_number - 1) * page_size;
 
   let filtrate = {};
 
+  // kondisi untuk search
   if(search){
     filtrate = {email: {$regex: search, $options: 'i'}};
   }
 
   let sorting = {};
 
+  // kondisi untuk melakukan sorting ascending dan descending
   if(sort){
     const [field, order] = sort.split(':');
     if (order === 'desc'){
@@ -198,6 +202,7 @@ async function Balance(id){
   return user.balance || 0;
 }
 
+// pada penarikan akan di kurangin dari jumlah balance yang sudah ada
 async function Withdraw(id, amount){
   const user = await usersRepository.getUser(id);
 
@@ -205,14 +210,16 @@ async function Withdraw(id, amount){
     return false;
   }
 
+
   user.balance -= amount;
+  await usersRepository.Statement(id, {type: 'withdraw', amount})
   await user.save();
   
   
-  return true;
+  return user.balance;
 }
 
-
+// pada setoran juga akan di hitung berdasarkan dana yang terakhir akan di tambahkan
 async function Deposit(id, amount){
   const user = await usersRepository.getUser(id);
 
@@ -221,17 +228,14 @@ async function Deposit(id, amount){
   }
 
   user.balance = (user.balance || 0) + amount;
+  await usersRepository.Statement(id, {type: 'deposit', amount})
   await user.save();
 
-  return true;
+  return user.balance;
 }
 
 async function Histori(id){
-  const user = await usersRepository.getUser(id);
-  if(!user){
-    throw new Error('user not found')
-  }
-  return user.transaction || [];
+  return usersRepository.Histori(id);
 }
 
 module.exports = {

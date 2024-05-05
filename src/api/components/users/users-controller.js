@@ -11,13 +11,15 @@ const { errorResponder, errorTypes } = require('../../../core/errors');
 async function getUsers(request, response, next) {
   try {
 
+    // validasi untuk respon
     const page_number = parseInt(request.query.page_number) || 1;
     const page_size = parseInt(request.query.page_size) || 5;
     const sort = request.query.sort || '';
     const search = request.query.search || '';
 
     const users = await usersService.getUsers(page_number, page_size, search, sort);
-
+    
+    // untuk membuat tampilan yang akan muncul di respon
     const data = {
       Page_Number: page_number,
       Page_Size: page_size,
@@ -214,6 +216,7 @@ async function changePassword(request, response, next) {
 
 // digital banking
 
+// untuk melakukan check saldo pada id
 async function Balance(request, response, next){
   try{
     const balance = await usersService.Balance(request.params.id);
@@ -225,7 +228,7 @@ async function Balance(request, response, next){
   }
 }
 
-
+// untuk melakukan penarikan dana, akan dilihat sesuai dengan id dan amountnya
 async function Withdraw(request, response, next){
   try{
     const {id} = request.params;
@@ -235,14 +238,15 @@ async function Withdraw(request, response, next){
     if(!success){
       throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY, 'fail to withdraw');
     }
-
+    // agar data tersimpan di histori
+    await usersService.Histori(id, {type: 'withdraw', amount})
     return response.status(200).json({message: 'Withdraw successfully'});
   }catch(error){
     return next(error);
   }
 }
 
-
+// untuk melakukan setoran pada amount yang berdasarkan id
 async function Deposit(request, response, next){
   try{
     const {id} = request.params;
@@ -252,13 +256,15 @@ async function Deposit(request, response, next){
     if(!success){
       throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY, 'fail to deposit');
     }
-
+    // agar data tersimpan di histori
+    await usersService.Histori(id, {type: 'deposit', amount})
     return response.status(200).json({message: 'deposit successfully'});
   }catch(error){
     return next(error);
   }
 }
 
+// untuk melihat transaksi yang sudah di lakukan sebelumnya
 async function Histori(request, response, next){
   try{
     const transaction = await usersService.Histori(request.params.id);

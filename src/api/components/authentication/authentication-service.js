@@ -5,9 +5,10 @@ const { attempt } = require('joi');
 const { last } = require('lodash');
 
 
-
+// untuk menampung data yang gagal login
 const failLogin = {};
 
+// kondisi dimana kalau gagal login, akan di tampung lalu di hitung berapa kali gagal, dan juga menampilkan informasi jam 
 function countFailLogin(email){
   const now = Date.now();
   if(!failLogin[email]){
@@ -19,15 +20,16 @@ function countFailLogin(email){
   }
 }
 
-
+// untuk menampung yang loginnya berhasil 
 const successLogin = {};
 
+//  menampilkan jam secara real time 
 function countSuccessLogin(email){
   const now = Date.now();
   successLogin[email] = now;
 }
 
-
+// untuk perhitungan limit, sesuai dengan soal dimana limit yang di minta adalah 5 kali kesalahan
 function attemptLimit(email){
   const loginData = failLogin[email];
 
@@ -36,6 +38,7 @@ function attemptLimit(email){
   }
 
   const now = Date.now();
+  // perhitungan lama resetnya 30 menit 
   const pause = 60 * 30;
 
   if(now - loginData.lastAttempt > pause){
@@ -43,10 +46,12 @@ function attemptLimit(email){
     return false;
   }
 
+  // untuk gagal login max 5 kali
   const maxFail = 5;
   return loginData.attempt >= maxFail;
 }
 
+// untuk menampilkan user yang susah logout 
 function logoutUser(email){
   const now = Date.now();
   const LastLog = successLogin[email];
@@ -69,14 +74,14 @@ function logoutUser(email){
  * @returns {object} An object containing, among others, the JWT token if the email and password are matched. Otherwise returns null.
  */
 async function checkLoginCredentials(email, password) {
-
+  // pesan kalau sudah gagal pada percobaan ke 6
   if (attemptLimit(email)){
     throw new Error(
       `[ ${new Date().toLocaleString()} ] User ${email} mencoba login, namun mendapat error 403 karena telah melebihi limit attempt.`
     );
   }
   const user = await authenticationRepository.getUserByEmail(email);
-
+  // pesan untuk menampilkan gagal login dan hitungan sudah berapa kali gagal, dimulai dari 1
   if(!user){
     countFailLogin(email);
     throw new Error(
