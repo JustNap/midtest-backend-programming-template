@@ -1,5 +1,6 @@
 const joi = require('joi');
 const { joiPasswordExtendCore } = require('joi-password');
+const { Balance, Withdraw, Deposit, Histori } = require('./users-service');
 const joiPassword = joi.extend(joiPasswordExtendCore);
 
 module.exports = {
@@ -46,6 +47,36 @@ module.exports = {
         .required()
         .label('New password'),
       password_confirm: joi.string().required().label('Password confirmation'),
+    },
+  },
+
+  Balance: {
+    params:{
+      id: joi.string().required().label('User ID'),
+    },
+  },
+
+  Withdraw: {
+    params:{
+      id: joi.string().required().label('User ID'),
+    },
+    body: {
+      amount: joi.number().positive().required().label('amount'),
+    },
+  },
+
+  Deposit: {
+    params:{
+      id: joi.string().required().label('User ID'),
+    },
+    body: {
+      amount: joi.number().positive().required().label('amount'),
+    },
+  },
+
+  Histori: {
+    params:{
+      id: joi.string().required().label('User ID'),
     },
   },
 };

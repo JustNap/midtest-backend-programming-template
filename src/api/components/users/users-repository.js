@@ -32,11 +32,13 @@ async function getUser(id) {
  * @param {string} password - Hashed password
  * @returns {Promise}
  */
-async function createUser(name, email, password) {
+async function createUser(name, email, password, firstBalance = 0) {
   return User.create({
     name,
     email,
     password,
+    balance : firstBalance,
+    transactions: []
   });
 }
 
@@ -89,6 +91,24 @@ async function changePassword(id, password) {
   return User.updateOne({ _id: id }, { $set: { password } });
 }
 
+
+
+// digital banking
+
+async function Deposit(id, amount){
+  return User.updateOne({_id: id}, {$inc: {balance: amount}});
+}
+
+async function Withdraw(id, amount){
+  return User.updateOne(
+    {_id: id, balance: {$gte: amount}}, 
+    {$inc: {balance: -amount}});
+}
+
+async function Statement(id, transaction){
+  return User.updateOne({_id: id}, {$push: {transactions: transaction}});
+}
+
 module.exports = {
   getUsers,
   getUser,
@@ -99,4 +119,7 @@ module.exports = {
   deleteUser,
   getUserByEmail,
   changePassword,
+  Deposit,
+  Withdraw,
+  Statement,
 };

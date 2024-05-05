@@ -212,6 +212,64 @@ async function changePassword(request, response, next) {
   }
 }
 
+// digital banking
+
+async function Balance(request, response, next){
+  try{
+    const balance = await usersService.Balance(request.params.id);
+    
+    
+    return response.status(200).json({balance});
+  } catch (error){
+    return next (error);
+  }
+}
+
+
+async function Withdraw(request, response, next){
+  try{
+    const {id} = request.params;
+    const {amount} = request.body;
+
+    const success = await usersService.Withdraw(id, amount);
+    if(!success){
+      throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY, 'fail to withdraw');
+    }
+
+    return response.status(200).json({message: 'Withdraw successfully'});
+  }catch(error){
+    return next(error);
+  }
+}
+
+
+async function Deposit(request, response, next){
+  try{
+    const {id} = request.params;
+    const {amount} = request.body;
+
+    const success = await usersService.Deposit(id, amount);
+    if(!success){
+      throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY, 'fail to deposit');
+    }
+
+    return response.status(200).json({message: 'deposit successfully'});
+  }catch(error){
+    return next(error);
+  }
+}
+
+async function Histori(request, response, next){
+  try{
+    const transaction = await usersService.Histori(request.params.id);
+    
+
+    return response.status(200).json(transaction);
+  }catch(error){
+    return next(error);
+  }
+}
+
 module.exports = {
   getUsers,
   getUser,
@@ -219,4 +277,8 @@ module.exports = {
   updateUser,
   deleteUser,
   changePassword,
+  Balance,
+  Withdraw,
+  Deposit,
+  Histori,
 };

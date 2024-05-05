@@ -42,4 +42,29 @@ module.exports = (app) => {
     celebrate(usersValidator.changePassword),
     usersControllers.changePassword
   );
+
+  // digital banking 
+
+  // cek saldo
+  route.get ('/:id/balance', authenticationMiddleware, usersControllers.Balance);
+
+  // tarik dana
+  route.post(
+    '/:id/withdraw',
+    authenticationMiddleware,
+    celebrate(usersValidator.Withdraw),
+    usersControllers.Withdraw
+  );
+
+  // setor dana
+  route.post(
+    '/:id/deposit',
+    authenticationMiddleware,
+    celebrate(usersValidator.Deposit),
+    usersControllers.Deposit
+  );
+
+  // histori transaksi
+  route.get ('/:id/transaction', authenticationMiddleware, usersControllers.Histori);
+
 };

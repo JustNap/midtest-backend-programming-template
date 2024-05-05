@@ -81,7 +81,7 @@ async function createUser(name, email, password) {
   const hashedPassword = await hashPassword(password);
 
   try {
-    await usersRepository.createUser(name, email, hashedPassword);
+    await usersRepository.createUser(name, email, hashedPassword, firstBalance);
   } catch (err) {
     return null;
   }
@@ -189,6 +189,51 @@ async function changePassword(userId, password) {
   return true;
 }
 
+
+// digital banking
+
+
+async function Balance(id){
+  const user = await usersRepository.getUser(id);
+  return user.balance || 0;
+}
+
+async function Withdraw(id, amount){
+  const user = await usersRepository.getUser(id);
+
+  if (!user || user.balance < amount){
+    return false;
+  }
+
+  user.balance -= amount;
+  await user.save();
+  
+  
+  return true;
+}
+
+
+async function Deposit(id, amount){
+  const user = await usersRepository.getUser(id);
+
+  if(!user){
+    return false;
+  }
+
+  user.balance = (user.balance || 0) + amount;
+  await user.save();
+
+  return true;
+}
+
+async function Histori(id){
+  const user = await usersRepository.getUser(id);
+  if(!user){
+    throw new Error('user not found')
+  }
+  return user.transaction || [];
+}
+
 module.exports = {
   getUsers,
   getUser,
@@ -198,4 +243,8 @@ module.exports = {
   emailIsRegistered,
   checkPassword,
   changePassword,
+  Balance,
+  Withdraw,
+  Deposit,
+  Histori,
 };
